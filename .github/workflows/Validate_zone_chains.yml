@@ -1,0 +1,25 @@
+on:
+  pull_request:
+    branches:
+      - main
+name: Pull request workflow
+jobs:
+  validate_assetlists:
+    name: Validate zone chains
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: true
+      - name: Git Sumbodule Update
+        run: |
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
+      - name: Validate Zone Chains schema
+        uses: snapcart/json-schema-validator@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          json_schema: ./zone_chains.schema.json
+          json_path_pattern: .*zone_chains.json$
